@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  broker:
+    build: .
+    container_name: broker
+    ports:
+      - "8883:8883"    # Expose the TLS port for the broker
+    networks:
+      - iot-network
+    environment:
+      - ROLE=broker
+    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]
+
+  client1:
+    build: .
+    container_name: client1
+    networks:
+      - iot-network
+    environment:
+      - ROLE=client
+    command: ["python3", "/app/CSMIM_Network/Client_v_1_5_raw/client.py"]
+
+  client2:
+    build: .
+    container_name: client2
+    networks:
+      - iot-network
+    environment:
+      - ROLE=client
+    command: ["python3", "/app/CSMIM_Network/Client_v_1_5_raw/client.py"]
+
+networks:
+  iot-network:
+    driver: bridge
