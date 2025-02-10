@@ -25,7 +25,7 @@ WORKDIR /app
 COPY . /app
 
 # Install required Python packages.
-RUN pip3 install --no-cache-dir paho-mqtt cbor2 schedule
+RUN pip3 install --no-cache-dir paho-mqtt cbor2 schedule time
 
 # Create the directories for mosquitto configuration and certificates.
 RUN mkdir -p /etc/mosquitto/conf.d && mkdir -p /etc/mosquitto/certs
