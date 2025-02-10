@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Test Docker Compose
 
 on:
   push:
@@ -12,5 +12,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build Docker image
-        run: docker build -t 853net .
+      # Build and start the containers using docker-compose
+      - name: Build and run Docker Compose
+        run: |
+          docker-compose up --build -d
+          # Optionally, wait for services to start up.
+          sleep 10
+          docker-compose ps
+
+      # Tear down the containers after the test
+    # - name: Shut down Docker Compose services
+      #  run: docker-compose down
