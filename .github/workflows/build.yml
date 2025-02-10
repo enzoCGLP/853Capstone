@@ -2,7 +2,7 @@ name: Build and Test Docker Compose
 
 on:
   push:
-    branches: [ main ]
+    branches: [ docker ]
   workflow_dispatch:
 
 jobs:
