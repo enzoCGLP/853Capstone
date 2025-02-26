@@ -14,7 +14,11 @@ RUN apt-get update && \
       mosquitto-clients \
       openssl \
       python3 \
-      python3-pip && \
+      python3-pip \
+      #network utilities for testing:
+      iproute2 \
+      iputils-ping && \
+      #end network utilites list
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -22,7 +26,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy repo to container
-COPY ./CSMIM_Network /app
+COPY . /app
 
 # Install required Python packages.
 RUN pip3 install --no-cache-dir paho-mqtt cbor2 schedule
@@ -31,10 +35,10 @@ RUN pip3 install --no-cache-dir paho-mqtt cbor2 schedule
 RUN mkdir -p /etc/mosquitto/conf.d && mkdir -p /etc/mosquitto/certs
 
 # Copy the provided Mosquitto configuration file to the expected location.
-RUN cp CSMIM_Network/Broker_Config/mosquitto.conf /etc/mosquitto/mosquitto.conf
+RUN cp ./CSMIM_Network/Broker_Config/mosquitto.conf /etc/mosquitto/mosquitto.conf
 
 # Expose the Mosquitto TLS port (8883) if the container is run as a broker.
-EXPOSE 8883
+EXPOSE 1883
 
 # open command prompt
 CMD ["/bin/bash"]

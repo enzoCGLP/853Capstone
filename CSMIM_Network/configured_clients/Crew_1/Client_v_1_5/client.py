@@ -24,8 +24,8 @@ properties = Properties(PacketTypes.CONNECT)
 ###### Uncomment for Debug ######  
 #cur_client.on_connect = on_connect
     ###### For TLS ######
-cur_client.tls_set(ca_certs = client_config.ca_certs_file)
-cur_client.tls_insecure_set(True) # !!!! Setting false will break TLS !!!!
+#cur_client.tls_set(ca_certs = client_config.ca_certs_file)
+#cur_client.tls_insecure_set(True) # !!!! Setting false will break TLS !!!!
     ###### Connect and loop ######
 cur_client.connect(client_config.broker_name, client_config.broker_port, client_config.keep_alive, clean_start=False, properties=properties)
 cur_client.loop_start()
