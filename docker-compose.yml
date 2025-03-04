@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  broker:
+    build: .
+    container_name: broker
+    hostname: broker
+    ports:
+      - "1883:1883"  # Expose the MQTT port
+    networks:
+      - iot-network
+    environment:
+      - ROLE=broker
+    volumes:
+      - mosquitto_log_data:/var/log/mosquitto  # Mount volume for logs
+    command: ["mosquitto", "-c", "/etc/mosquitto/mosquitto.conf"]  # Run mosquitto
+
+  client1:
+    build: .
+    container_name: Crew_1
+    networks:
+      - iot-network
+    environment:
+      - ROLE=client
+    command: ["python3", "/app/CSMIM_Network/configured_clients/Crew_1/Client_v_1_5/client.py"]
+    depends_on:
+      - broker
+
+  client2:
+    build: .
+    container_name: Light_1
+    networks:
+      - iot-network
+    environment:
+      - ROLE=client
+    command: ["python3", "/app/CSMIM_Network/configured_clients/Light_1/Client_v_1_5/client.py"]
+    depends_on:
+      - broker
+
+networks:
+  iot-network:
+    driver: bridge
+
+volumes:
+  mosquitto_log_data:  #docker volume for mosquitto logs so that they can persist

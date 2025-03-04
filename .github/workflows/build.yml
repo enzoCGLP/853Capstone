@@ -1,0 +1,30 @@
+name: Build and Test Docker Compose
+
+on:
+  push:
+    branches: [ docker ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+#install docker-compose
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      # Build and start the containers using docker-compose
+      - name: Build and run Docker Compose
+        run: |
+          docker-compose up --build -d
+          # Optionally, wait for services to start up.
+          sleep 10
+          docker-compose ps
+
+      # Tear down the containers after the test
+    # - name: Shut down Docker Compose services
+      #  run: docker-compose down

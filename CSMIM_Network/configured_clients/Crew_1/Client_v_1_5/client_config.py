@@ -13,12 +13,12 @@ executable_users = ["user", "light_1"]
 user_name = "crew_1"
 password = "password"
     ###### Broker Config ######
-broker_name = "192.168.80.130" # IP or host name of broker server
-broker_port = 8883 # Destination port (Unsecure=1883 Secure=8883)
+broker_name = "broker" # IP or host name of broker server
+broker_port = 1883 # Destination port (Unsecure=1883 Secure=8883)
 keep_alive = 60 # Connection keep alive value
 
 #################### CA Cert Info ####################
-ca_certs_file = "certs/ca-root-cert.crt"  # File location of CA cert
+ca_certs_file = "CSMIM_Network/Client_v_1_5_raw/certs/ca-root-cert.crt"  # File location of CA cert
 
 #################### AUTO or MANUAL TESTING CONFIG ####################
 auto_testing = "yes" # Set: 'yes' for AUTOMATIC or 'no' for MANUAL testing
