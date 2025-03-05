@@ -1,0 +1,95 @@
+################################################################################
+              READ ME TLS CERTIFICATE CHAIN CREATION (CA and SERVER)
+################################################################################
+RESOURCES:
+    * https://mosquitto.org/download/
+    * https://mosquitto.org/man/mosquitto-conf-5.html
+    * https://mosquitto.org/man/mosquitto_passwd-1.html
+    * https://mosquitto.org/documentation/authentication-methods/
+    * http://www.steves-internet-guide.com/install-mosquitto-linux/
+    * http://www.steves-internet-guide.com/mqtt-username-password-example/
+
+DEPENDENCIES:
+
+NOTE:
+    * Ensure host name of server is mapped to IP address of the MQTT network, if not re-map it
+    * It is a good idea to create a backup of mosquitto.conf or any other configuration related files before making changes. 
+    * Reset mosquitto service after any changes to mosquitto.conf and passwordfile [sudo systemctl restart mosquitto.service]
+
+TROUBLESHOOTING:
+    * Check /var/log/mosquitto/mosquitto.log to see broker connection logs
+	* Useful when errors occur at broker restart or client connection errors occur
+
+########################################
+         INSTALL/SET-UP: UBUNTU
+########################################
+
+INSTALL (Taken from steves-internet-guide.com):
+
+    * sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+    * sudo apt-get update
+    * sudo apt-get install mosquitto
+    * sudo apt-get install mosquitto-clients
+    * sudo apt clean
+
+SET-UP:
+
+    * Navigate to: /etc/mosquito
+    * Open mosquitto.conf in an editor (May require sudo permissions)
+    * See mosquitto.conf example below for setup.
+	* Add listener(s)
+	    * Allow_anonymous false
+	    * Directory of password file
+	* Certificate directories
+	* TLS version (REQUIRED for CSMIM: tlsv1.3)
+    * Create a password file:
+	* Option 1:
+	    * Create your on password.txt file and save its location in mosquitto.conf
+            * FORMAT: user_name:password
+	* Option 2 (Perfered):
+	    * Use mosquittopasswd command to create, add, and delete users/passwords
+		* Requires sudo permissions
+		* This method automaticaly creates a password file
+		* Passwords are stored as hashes
+	    * CREATE FILE: [sudo mosquitto_passwd -c <password_file> <user_name>]
+	        * Enter password for new user
+	    * ADD/UPDATE USERS (perfered): [sudo mosquitto_passwd <password_file> <user_name>]
+		* This option conceals password in command line
+	    * OPTIONAL ADD/UPDATE: [sudo mosquitto_passwd -b <password_file> <user_name> <password>]
+		* Password is visible in command line
+	    * DELETE USER: [sudo mosquitto_passwd -D <password_file> <user_name>]
+    * Change password file ownership, group, and permissions, for security and future compatability as follows:
+	* Ownership: [sudo chown mosquitto <passwordfile>]
+	* Group: [sudo chgrp mosquitto <passwordfile>]
+    	* Permissions: [sudo chmod 700 <passwordfile>]
+    * Start mosquitto broker service: [sudo systemctl start mosquitto.service]
+
+################################################################################
+EXAMPLE(mosquitto.conf):
+################################################################################
+# Place your local configuration in /etc/mosquitto/conf.d/
+# A full description of the configuration file is at
+# /usr/share/doc/mosquitto/examples/mosquitto.conf.example
+
+#pid_file /run/mosquitto/mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+
+log_dest file /var/log/mosquitto/mosquitto.log
+per_listener_settings false
+include_dir /etc/mosquitto/conf.d
+
+# Secure TLS port
+listener 8883
+allow_anonymous false
+password_file /etc/mosquitto/passwordfile
+
+# Certificates
+cafile /etc/mosquitto/certs/ca-root-cert.crt
+keyfile /etc/mosquitto/certs/server.key
+certfile /etc/mosquitto/certs/server.crt
+
+# TLS version
+tls_version tlsv1.3
+################################################################################

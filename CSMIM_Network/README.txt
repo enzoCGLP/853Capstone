@@ -7,7 +7,7 @@ Editor(s): Enzo Gonzalez, Parker Labine, and Trevor French
 ################################################################################
 
 This folder contains:
-    * Broker_Config
+    * CDS_Config
         * broker_setup.txt
         * ca_cert_creation.txt
         * mosquitto.conf

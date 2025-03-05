@@ -35,10 +35,20 @@ RUN pip3 install --no-cache-dir paho-mqtt cbor2 schedule
 RUN mkdir -p /etc/mosquitto/conf.d && mkdir -p /etc/mosquitto/certs
 
 # Copy the provided Mosquitto configuration file to the expected location.
-RUN cp ./CSMIM_Network/Broker_Config/mosquitto.conf /etc/mosquitto/mosquitto.conf
+RUN cp ./CSMIM_Network/CDS_Config/mosquitto.conf /etc/mosquitto/mosquitto.conf
+
+# Copy the provided certification files and password file to the expected location.
+RUN cp ./CSMIM_Network/Client_v_1_6_raw/certs/ca-root-cert.crt /etc/mosquitto/certs/ca-root-cert.crt
+RUN cp ./CSMIM_Network/Client_v_1_6_raw/certs/server.crt /etc/mosquitto/certs/server.crt
+RUN cp ./CSMIM_Network/Client_v_1_6_raw/certs/server.key /etc/mosquitto/certs/server.key
+RUN cp ./CSMIM_Network/Client_v_1_6_raw/certs/ca.key /etc/mosquitto/certs/ca.key
+RUN cp ./CSMIM_Network/CDS_Config/passwordfile /etc/mosquitto/passwordfile
+
+# Update permissions for certification files
+RUN chmod 644 /etc/mosquitto/certs/ca.key && chmod 644 /etc/mosquitto/certs/server.key
 
 # Expose the Mosquitto TLS port (8883) if the container is run as a broker.
-EXPOSE 1883
+EXPOSE 8883
 
 # open command prompt
 CMD ["/bin/bash"]
