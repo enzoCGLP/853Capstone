@@ -35,7 +35,7 @@ services:
       - iot-network
     environment:
       - ROLE=client
-    command: ["python3", "/app/CSMIM_Network/configured_clients/Crew_1/Client/client.py"]
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Crew_1/Client/client.py; tail -f /dev/null"
     depends_on:
       - broker
 
@@ -46,7 +46,7 @@ services:
       - iot-network
     environment:
       - ROLE=client
-    command: ["python3", "/app/CSMIM_Network/configured_clients/Light_1/Client/client.py"]
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Light_1/Client/client.py; tail -f /dev/null"
     depends_on:
       - broker
 
@@ -58,9 +58,13 @@ services:
     networks:
       - iot-network
     ports:
-      - "5901:5901"  # VNC port
+      - "5901:5901"  # Optional: raw VNC
+      - "6080:6080"  
+    environment:
+      - USER=root
     tty: true
     stdin_open: true
+
 
 
 networks:
