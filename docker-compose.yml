@@ -50,6 +50,22 @@ services:
     depends_on:
       - broker
 
+  kali-gui:
+    image: accetto/kali-xfce-vnc
+    container_name: kali-gui
+    networks:
+      - iot-network
+    ports:
+      - "6080:6080"  # Access GUI via browser at http://localhost:6080
+    environment:
+      - VNC_PW=kali  # Password to access the VNC session (user: root)
+    tty: true
+    stdin_open: true
+    command: bash -c "\
+      apt-get update && \
+      apt-get install -y wireshark scapy nmap ettercap-graphical && \
+      /headless/startup.sh"
+
 networks:
   iot-network:
     driver: bridge
