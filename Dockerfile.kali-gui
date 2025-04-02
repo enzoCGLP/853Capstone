@@ -3,19 +3,24 @@ FROM kalilinux/kali-rolling
 ENV DEBIAN_FRONTEND=noninteractive
 ENV USER=root
 
-# Install XFCE, VNC server, noVNC dependencies, and tools
+# Install desktop environment, tools, VNC, and noVNC dependencies
 RUN apt-get update && apt-get install -y \
     xfce4 xfce4-goodies tightvncserver websockify git curl \
-    wireshark scapy nmap ettercap-graphical && \
+    wireshark scapy nmap ettercap-graphical net-tools && \
     git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
     git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
     ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
     mkdir -p /root/.vnc && \
     echo "kali" | vncpasswd -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd
 
-# Launch VNC + noVNC
-CMD bash -c "\
-  vncserver :1 -geometry 1280x800 -depth 24 && \
-  sleep 2 && \
-  /opt/noVNC/utils/websockify/run 6080 localhost:5901"
+# Create basic xstartup for VNC to launch XFCE
+RUN echo '#!/bin/sh\nxrdb $HOME/.Xresources\nstartxfce4 &' > /root/.vnc/xstartup && \
+    chmod +x /root/.vnc/xstartup
 
+# Expose VNC and noVNC ports
+EXPOSE 5901 6080
+
+# Run VNC server + noVNC bridge on startup
+CMD bash -c "\
+    vncserver :1 -geometry 1280x800 -depth 24 && \
+    /opt/noVNC/utils/websockify/run --web /opt/noVNC 6080 localhost:5901"
