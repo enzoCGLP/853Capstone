@@ -1,20 +1,17 @@
 FROM kalilinux/kali-rolling
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV USER=root
 
-RUN apt-get update && \
-    apt-get install -y \
-    xfce4 xfce4-goodies \
-    tightvncserver \
-    wget net-tools curl \
-    wireshark scapy nmap ettercap-graphical \
-    git sudo && \
-    apt-get clean
+# Install XFCE, VNC server, noVNC dependencies, and tools
+RUN apt-get update && apt-get install -y \
+    xfce4 xfce4-goodies tightvncserver websockify git curl \
+    wireshark scapy nmap ettercap-graphical && \
+    git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
+    mkdir -p /root/.vnc && \
+    echo "kali" | vncpasswd -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd
 
-# Set password for VNC
-RUN mkdir -p /root/.vnc && \
-    echo "kali" | vncpasswd -f > /root/.vnc/passwd && \
-    chmod 600 /root/.vnc/passwd
-
-# Start VNC on display :1
-CMD ["bash", "-c", "vncserver :1 -geometry 1280x800 -depth 24 && tail -f /dev/null"]
+# Launch VNC + noVNC
+CMD bash -c "vncserver :1 -geometry 1280x800 -depth 24 && /opt/noVNC/utils/launch.sh --vnc localhost:5901"
