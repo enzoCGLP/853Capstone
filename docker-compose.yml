@@ -58,7 +58,7 @@ services:
     ports:
       - "6080:6080"  # Access GUI via browser at http://localhost:6080
     environment:
-      - VNC_PW=kali  # Password to access the VNC session (user: root)
+      - VNC_PW=root  # Password to access the VNC session (user: root)
     tty: true
     stdin_open: true
     command: bash -c "\
