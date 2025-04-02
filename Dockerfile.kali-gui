@@ -14,8 +14,12 @@ RUN apt-get update && apt-get install -y \
     echo "kali" | vncpasswd -f > /root/.vnc/passwd && chmod 600 /root/.vnc/passwd
 
 # Create basic xstartup for VNC to launch XFCE
-RUN echo '#!/bin/sh\nxrdb $HOME/.Xresources\nstartxfce4 &' > /root/.vnc/xstartup && \
+RUN echo '#!/bin/sh\n\
+xrdb $HOME/.Xresources\n\
+export XKL_XMODMAP_DISABLE=1\n\
+startxfce4 &' > /root/.vnc/xstartup && \
     chmod +x /root/.vnc/xstartup
+
 
 # Expose VNC and noVNC ports
 EXPOSE 5901 6080
