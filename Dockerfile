@@ -7,7 +7,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install required packages
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:mosquitto-dev/mosquitto-ppa && \
     apt-get update && \
     apt-get install -y \
       mosquitto \
