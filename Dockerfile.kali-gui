@@ -6,7 +6,7 @@ ENV USER=root
 # Install desktop environment, tools, VNC, and noVNC dependencies
 RUN apt-get update && apt-get install -y \
     xfce4 xfce4-goodies tightvncserver websockify git curl \
-    wireshark scapy nmap ettercap-graphical net-tools && \
+    wireshark scapy nmap ettercap-graphical net-tools dbus-x11 && \
     git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
     git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
     ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html && \
