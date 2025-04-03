@@ -18,7 +18,7 @@ broker_port = 8883 # Destination port (Unsecure=1883 Secure=8883)
 keep_alive = 60 # Connection keep alive value
 
 #################### CA Cert Info ####################
-ca_certs_file = "CSMIM_Network/configured_clients/Light_1/Client_v_1_5/certs/ca-root-cert.crt"  # File location of CA cert
+ca_certs_file = "/app/CSMIM_Network/configured_clients/Light_1/Client_v_1_5/certs/ca-root-cert.crt"  # File location of CA cert
 
 #################### AUTO or MANUAL TESTING CONFIG ####################
 auto_testing = "yes" # Set: 'yes' for AUTOMATIC or 'no' for MANUAL testing
