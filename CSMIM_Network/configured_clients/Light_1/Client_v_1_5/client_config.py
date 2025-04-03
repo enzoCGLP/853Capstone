@@ -14,7 +14,7 @@ user_name = "light_1"
 password = "password"
     ###### Broker Config ######
 broker_name = "broker" # IP or host name of broker server
-broker_port = 1883 # Destination port (Unsecure=1883 Secure=8883)
+broker_port = 8883 # Destination port (Unsecure=1883 Secure=8883)
 keep_alive = 60 # Connection keep alive value
 
 #################### CA Cert Info ####################
