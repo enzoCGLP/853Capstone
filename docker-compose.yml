@@ -1,6 +1,52 @@
 version: '3.8'
 
 services:
+  syslog-ng:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    container_name: syslog-ng
+    hostname: syslog
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      #- LOG_TO_STDOUT= #optional
+    networks:
+      csmim-network:
+        ipv4_address: 172.18.0.2
+    volumes:
+      - syslog_data:/config
+      - syslog_data:/var/log 
+    ports:
+      - 514:5514/udp
+      - 601:6601/tcp
+      - 6514:6514/tcp
+    restart: unless-stopped
+
+  kali-linux:
+    image: lscr.io/linuxserver/kali-linux:latest
+    container_name: kali-linux
+    hostname: kali
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - "TITLE=Kali Linux" #optional
+    volumes:
+      - packet_capture_data:/captures
+    ports:
+      - 3000:3000
+      - 3001:3001
+    networks:
+      - csmim-network
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://172.18.0.2:5514"
+    shm_size: "1gb" #optional
+    restart: unless-stopped
+  
   broker:
     build: .
     container_name: broker
@@ -8,51 +54,85 @@ services:
     ports:
       - "8883:8883"  # Expose the MQTT port
     networks:
-      - iot-network
+      - csmim-network
     restart: always
     environment:
       - ROLE=broker
     volumes:
       - mosquitto_log_data:/var/log/mosquitto  # Mount volume for logs
-    # Launch mosquitto service and cds.py
-    command: bash -c "mosquitto -c /etc/mosquitto/mosquitto.conf"  # Run mosquitto and cds.py
+      - packet_capture_data:/captures
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://172.18.0.2:5514"
+    command: bash -c "mosquitto -c /etc/mosquitto/mosquitto.conf & nohup tcpdump -w /captures/broker.pcap " # Run mosquitto and tcpdump
+    depends_on:
+      - syslog-ng
 
   cds:
     build: .
-    container_name: CDS
+    container_name: cds
+    hostname: cds
     networks:
-      - iot-network
+      - csmim-network
+    volumes:
+      - packet_capture_data:/captures
+    restart: always
     environment:
       - ROLE=client
-    command: ["python3", "/app/CSMIM_Network/configured_clients/Crew_1/Client/cds.py"]
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://172.18.0.2:5514"
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Crew_1/Client/cds.py & tcpdump -w /captures/cds.pcap"
     depends_on:
       - broker
 
-  client1:
+  crew_1:
     build: .
-    container_name: Crew_1
+    container_name: crew_1
+    hostname: crew_1
     networks:
-      - iot-network
+      - csmim-network
     environment:
       - ROLE=client
-    command: ["python3", "/app/CSMIM_Network/configured_clients/Crew_1/Client/client.py"]
+    volumes:
+      - packet_capture_data:/captures #add correct path once best directory is determined
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Crew_1/Client/client.py & tcpdump -w /captures/crew_1.pcap"  
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://172.18.0.2:5514"
     depends_on:
       - broker
 
-  client2:
+  light_1:
     build: .
-    container_name: Light_1
+    container_name: light_1
+    hostname: light_1
     networks:
-      - iot-network
+      - csmim-network
     environment:
       - ROLE=client
-    command: ["python3", "/app/CSMIM_Network/configured_clients/Light_1/Client/client.py"]
+    volumes:
+      - packet_capture_data:/captures #add correct path once best directory is determined
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Light_1/Client/client.py & tcpdump -w /captures/light_1.pcap"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://172.18.0.2:514"
     depends_on:
       - broker
 
 networks:
-  iot-network:
+  csmim-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: "172.18.0.0/16"
+          gateway: 172.18.0.1
 
 volumes:
   mosquitto_log_data:  #docker volume for mosquitto logs so that they can persist
+  packet_capture_data:
+  syslog_data:

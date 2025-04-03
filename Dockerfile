@@ -16,6 +16,7 @@ RUN apt-get update && \
       python3 \
       python3-pip \
       #network utilities for testing:
+      tcpdump \
       iproute2 \
       iputils-ping && \
       #end network utilites list
