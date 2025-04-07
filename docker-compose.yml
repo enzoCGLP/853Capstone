@@ -38,6 +38,10 @@ services:
     ports:
       - 3000:3000
       - 3001:3001
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    privileged: true
     networks:
       - csmim-network
     logging:
