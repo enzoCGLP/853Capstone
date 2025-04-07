@@ -9,7 +9,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      #- LOG_TO_STDOUT= #optional
     networks:
       csmim-network:
         ipv4_address: 172.18.0.2
@@ -17,9 +16,9 @@ services:
       - syslog_data:/config
       - syslog_data:/var/log 
     ports:
-      - 514:5514/udp
-      - 601:6601/tcp
-      - 6514:6514/tcp
+      - "5514:5514/udp"
+      - "6601:6601/tcp"
+      - "6514:6514/tcp"
     restart: unless-stopped
 
   kali-linux:
@@ -27,17 +26,17 @@ services:
     container_name: kali-linux
     hostname: kali
     security_opt:
-      - seccomp:unconfined #optional
+      - seccomp:unconfined
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - "TITLE=Kali Linux" #optional
+      - "TITLE=Kali Linux"
     volumes:
       - packet_capture_data:/captures
     ports:
-      - 3000:3000
-      - 3001:3001
+      - "3000:3000"
+      - "3001:3001"
     cap_add:
       - NET_RAW
       - NET_ADMIN
@@ -48,28 +47,28 @@ services:
       driver: syslog
       options:
         syslog-address: "udp://172.18.0.2:5514"
-    shm_size: "1gb" #optional
+    shm_size: "1gb"
     restart: unless-stopped
-  
+
   broker:
     build: .
     container_name: broker
     hostname: broker
     ports:
-      - "8883:8883"  # Expose the MQTT port
+      - "8883:8883"
     networks:
       - csmim-network
     restart: always
     environment:
       - ROLE=broker
     volumes:
-      - mosquitto_log_data:/var/log/mosquitto  # Mount volume for logs
+      - mosquitto_log_data:/var/log/mosquitto
       - packet_capture_data:/captures
     logging:
       driver: syslog
       options:
         syslog-address: "udp://172.18.0.2:5514"
-    command: bash -c "mosquitto -c /etc/mosquitto/mosquitto.conf & nohup tcpdump -w /captures/broker.pcap " # Run mosquitto and tcpdump
+    command: bash -c "mosquitto -c /etc/mosquitto/mosquitto.conf & nohup tcpdump -w /captures/broker.pcap"
     depends_on:
       - syslog-ng
 
@@ -101,8 +100,8 @@ services:
     environment:
       - ROLE=client
     volumes:
-      - packet_capture_data:/captures #add correct path once best directory is determined
-    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Crew_1/Client/client.py & tcpdump -w /captures/crew_1.pcap"  
+      - packet_capture_data:/captures
+    command: bash -c "python3 /app/CSMIM_Network/configured_clients/Crew_1/Client/client.py & tcpdump -w /captures/crew_1.pcap"
     logging:
       driver: syslog
       options:
@@ -119,12 +118,12 @@ services:
     environment:
       - ROLE=client
     volumes:
-      - packet_capture_data:/captures #add correct path once best directory is determined
+      - packet_capture_data:/captures
     command: bash -c "python3 /app/CSMIM_Network/configured_clients/Light_1/Client/client.py & tcpdump -w /captures/light_1.pcap"
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://172.18.0.2:514"
+        syslog-address: "udp://172.18.0.2:5514"
     depends_on:
       - broker
 
@@ -137,6 +136,6 @@ networks:
           gateway: 172.18.0.1
 
 volumes:
-  mosquitto_log_data:  #docker volume for mosquitto logs so that they can persist
+  mosquitto_log_data:
   packet_capture_data:
   syslog_data:
