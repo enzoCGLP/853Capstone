@@ -42,7 +42,8 @@ services:
       - NET_ADMIN
     privileged: true
     networks:
-      - csmim-network
+      csmim-network:
+        ipv4_address: 172.18.0.3
     logging:
       driver: syslog
       options:
@@ -57,7 +58,8 @@ services:
     ports:
       - "8883:8883"
     networks:
-      - csmim-network
+      csmim-network:
+        ipv4_address: 172.18.0.4
     restart: always
     environment:
       - ROLE=broker
@@ -77,7 +79,8 @@ services:
     container_name: cds
     hostname: cds
     networks:
-      - csmim-network
+      csmim-network:
+        ipv4_address: 172.18.0.5
     volumes:
       - packet_capture_data:/captures
     restart: always
@@ -96,7 +99,8 @@ services:
     container_name: crew_1
     hostname: crew_1
     networks:
-      - csmim-network
+      csmim-network:
+        ipv4_address: 172.18.0.8
     environment:
       - ROLE=client
     volumes:
@@ -114,7 +118,8 @@ services:
     container_name: light_1
     hostname: light_1
     networks:
-      - csmim-network
+      csmim-network:
+        ipv4_address: 172.18.0.7
     environment:
       - ROLE=client
     volumes:
